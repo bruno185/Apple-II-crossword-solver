@@ -1,6 +1,8 @@
 ************************
 *   crossword solver   * 
 ************************
+* version  1.1
+* no tempo file, works in memory only.
 *
 * MLI (ProDOS)
 MLI             equ $BF00
@@ -172,13 +174,13 @@ main
         closef #$00     ; close all files
         jsr FREEBUFR    ; free all buffers
         jsr bigloop     ; main program loop : porcess all letters for one part
-        jsr countbit    ; count 1 bits for this part
-
-        jsr updatetotcnt ; update total found
+        ;jsr countbit    ; count 1 bits for this part
+        ;jsr saveindex   ; copy index data to TEMPO file
         ;prnstr seplib   ;  print count
         ;jsr print24bits
 
-        jsr displayw    ; prints found words
+        jsr bigdisplay    ; prints found words
+        jsr updatetotcnt ; update total found
 
         inc part        ; next part (on 4)
         lda part 
@@ -222,8 +224,7 @@ bigll
                         ; AND $2000 area and $5000 area, result in $2000 area (in aux)
 * optimisation : comment next 3 jsr.
 dolong  jsr dowlen      ; set RLE index file name for length
-        jsr dofile      ; process RLE index
-        jsr saveindex   ; copy index data to TEMPO file
+        jsr dofile      ; process RLE inde
 bloopnext
         inc pos         ; next char in pattern
         ldx pos
@@ -234,55 +235,6 @@ bloopnext
 *
 * end bigloop
 *
-
-saveindex
-* saves index data ($2000-$4F27 in aux) to a tempo file.
-* file name = TEMPO1, TEMPO2... according to part number.
-        ;lda RSHIMEM     ; debug RSHIMEM 
-        jsr settempofn  ; set tempox file name in fname (param of open mli call)
-        jsr copyindextomain     ; copy $2000.$2000+$2F27 => main mem.
-        ;lda $BEFB
-        
-        jsr MLI         ; destroy previous tempo file if any    
-        dfb destroy
-        da  c1_parms
-
-        jsr MLI         ; create file
-        dfb create 
-        da c0_parms
-
-        jsr setopenbuffer ; get free mem from ProDOS for OPEN call (mli)  
-        jsr MLI         ; OPEN tempo file
-        dfb open
-        da c8_parms
-
-        lda ref         ; get ID of open file
-        sta refw        ; set ID for write call
-
-        jsr MLI
-        dfb write
-        da cb_parms
-
-        lda #$00
-        sta $BF94
-        closef ref    ; close tempo file
-        rts
-
-settempofn
-        ldx tempfile    ; copy 'TEMPO' to open param.
-        stx fname
-copytmp lda tempfile,x 
-        sta fname,x 
-        dex
-        bne copytmp
-        inc fname       ; add part number
-        ldx part
-        lda tohex,x 
-        ldx fname
-        sta fname,x 
-        ;prnstr fname
-        rts
-
 dowlen                  ; Add criterion of word length by load Lx RLE index file 
                         ; x=length of words.
                         ; prepare file name
@@ -554,7 +506,7 @@ bmp1
         sta counter
         lda filelength+1
         sta counter+1
-        jsr countbyte   ; count bytes 
+        ;jsr countbyte   ; count bytes 
 
         lda filelength+1 ; counter = filelength / 2
         lsr
@@ -617,42 +569,6 @@ d16     dec counter
 zero    clc             ; carry clear if counter = 0             
         rts
 *
-countbyte               ; count bytes to be uncompressed, result in tempo var
-        lda #<indexrl   ; set indexrl address in ptr1 (source)
-        sta ptr1
-        lda #>indexrl
-        sta ptr1+1  
-        lda #$00        ; init tempo var
-        sta tempo
-        sta tempo+1 
-cntloop
-        ldy #$00  
-        lda (ptr1),y    ; get count 
-        clc
-        adc tempo       ; update tempo var
-        sta tempo
-        lda #$00 
-        adc tempo+1
-        sta tempo+1
-        jsr dec16       ; counter = coounter - 2
-        jsr dec16       
-        bcc cntout      ; exit on counter = 0 (flag C = 0)
-        lda ptr1        ; ptr1 = ptr1 + 2
-        clc
-        adc #$02
-        sta ptr1
-        lda #$00
-        adc ptr1+1
-        sta ptr1+1
-inc2    jmp cntloop
-        
-cntout
-        ;prnstr indexsizelib 
-        ;lda tempo+1     ; display tempo var
-        ;ldx tempo
-        ;jsr LINPRT
-        rts
-
 *********************** utils ***********************
 mygetln                 ; to let user input pattern 
                         ; takes juste upper letters ans ?
@@ -948,7 +864,8 @@ l1      lda path,x
 good1   
         rts
 *
-        put disp.s
+        ; put disp.s
+        put bigdisplay.S
 
 
 ********************  disconnect /RAM  **********************
@@ -1172,11 +1089,10 @@ patternlib      str 'Enter pattern (A-Z and ?) : '
 kopatlib        str 'Error in pattern !'
 patlib          str 'Pattern : '
 seplib          str ' : '
-titlelib        asc ' C R O S S - W O R D   S O L V E R'
+titlelib        asc ' C R O S S W ? R D   S O L V E R (v. 1.1)'
                 hex 00
 
 words           str 'WORDS'
-tempfile        str 'TEMPO'
 
 pattern ds 16
 refword ds 1

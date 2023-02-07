@@ -1,14 +1,11 @@
-**********************
-* DISPAY found words *
-**********************
 *
-displayw
-        lda counter    ; words found for this part total = 0 ?
+bigdisplay
+        jsr countbit    ; count 1 bits for this part
+        lda counter     ; words found for this part total = 0 ?
         ora counter+1
         ora counter+2
         bne adjustcnt   ; no : go on
         rts
-        ;jmp showr       ; yes show result
 
 adjustcnt
 * adjust wordscnt because last byte of a part is not significant partly
@@ -38,10 +35,9 @@ dodey   dey
         jmp dodey
 
 go
-        closef #$00     ; close all files
-        jsr FREEBUFR    ; free all buffers
-
 *** WORDS file
+        jsr copyindextomain     ; copy index to main 
+
         ldx words       ; open WORDS file
         stx fname       ; copy file name from to fname mli parameter 
 copyfn  lda words,x 
@@ -60,31 +56,6 @@ copyfn  lda words,x
         lda ref
         sta refword     ; save ref ID of WORDS file.
 
-        jsr settempofn  ; set TEMPOx file name in fname (param of open mli call)
-        jsr setopenbuffer ; get free mem from ProDOS for OPEN call (mli)  
-        jsr MLI         ; open tempo index file
-        dfb open
-        da  c8_parms
-
-*** TEMPO index file 
-        lda ref         ; get ref from previous OPEN call
-        sta refd1
-        jsr MLI         ; get file length 
-        dfb geteof
-        da d1_param
-
-        jsr readindex   ; prepare loading of index file
-        jsr MLI         ; load file in main memory ($2000)
-        dfb read
-        da  ca_parms
-
-        lda refd1       ; close TEMPO file
-        sta cc_parms+1
-        jsr MLI
-        dfb close
-        da cc_parms
-
-
 *** process index 
         lda #>bitmap1   ; set pointer to $2000 area
         sta ptr1+1
@@ -93,7 +64,7 @@ copyfn  lda words,x
 
 loopreadbyte
         ldy #$00
-        lda (ptr1),y    ; get byte to read
+        lda (ptr1),y    ; get byte to process
         sta tempo
         bne nonzero
         jmp zerobyte
@@ -180,6 +151,8 @@ chechhi lda ptr1+1
 dispexit
         lda #$00
         sta $BF94
+        closef #$00      
+        jsr FREEBUFR    ; free all buffers
         rts
 zerobyte
         lda wordscnt    ; word counter : +8
