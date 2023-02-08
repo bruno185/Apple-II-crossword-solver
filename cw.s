@@ -172,7 +172,7 @@ main
         ;lda #$00
         ;sta $BF94
         closef #$00     ; close all files
-        jsr FREEBUFR    ; free all buffers
+        jsr FREEBUFR    ; free all buffers 
         jsr bigloop     ; main program loop : porcess all letters for one part
         ;jsr countbit    ; count 1 bits for this part
         ;jsr saveindex   ; copy index data to TEMPO file
