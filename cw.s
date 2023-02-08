@@ -174,12 +174,8 @@ main
         closef #$00     ; close all files
         jsr FREEBUFR    ; free all buffers 
         jsr bigloop     ; main program loop : porcess all letters for one part
-        ;jsr countbit    ; count 1 bits for this part
-        ;jsr saveindex   ; copy index data to TEMPO file
-        ;prnstr seplib   ;  print count
-        ;jsr print24bits
-
         jsr bigdisplay    ; prints found words
+
         jsr updatetotcnt ; update total found
 
         inc part        ; next part (on 4)
@@ -217,9 +213,7 @@ bigll
         sta letter      ; yes : save char in letter var
 
         jsr interpret   ; set filename based on letter, position and part
-        ;cr
-        ;prnstr filelib
-        ;prnstr fname
+
         jsr dofile      ; load RLE file in main, decode in aux ($5000 area)
                         ; AND $2000 area and $5000 area, result in $2000 area (in aux)
 * optimisation : comment next 3 jsr.
