@@ -6,19 +6,17 @@ The challenge was to find the "hole words" among the 386264 French words allowed
 Of course, the data (words and indexes) do not fit on a floppy disk, but on a hard disk (physical or virtual) and occupy about 20 MB.
 
 ## Use
-This archive contains a disk image to be used it with Applewin or your favourite Apple II emulator.
+This archive contains a disk image (cw.po) to be used it your favourite Apple II emulator ou you Apple II.
 Start your Apple II with the "cw.po" disk.
 Launch the program with "brun cw", or "-cw"
-Type the capital letters, or ? for unknown letters. Enter to validate.
+Type the capital letters, or ? for unknown letters. Enter to validate. Escape or ctrl-c to exit.
 
 ## Performance
 On an Apple II or an emulator set at normal speed, the processing of each significant letter takes about 17 seconds.
 It is certainly possible to improve the performance, for example by using uncompressed indexes (I used RLE compression, but it may not be a good idea, to be explored).
 
-This archive contains a disk image to be used it with Applewin or your favourite Apple II emulator.
-
 ## Credits
-The algorithm is the one used in the French software "Easy Puss", for those who remember. It is applied to letters and positions in this case.
+The algorithm is the one used in the French software "Easy Puss", for those who remember this database software for Apple II published in the 80's. It is applied to letters and their positions in this case.
 I found the list of words here: http://www.3zsoftware.com/fr/listes.php
 (ods6.txt)
 
@@ -44,5 +42,5 @@ Note :
 DoMerlin.bat puts it all together. If you want to compile yourself, you will have to adapt the path to the Merlin32 directory, to Applewin and to Applecommander in DoMerlin.bat file.
 
 DoMerlin.bat is to be placed in project directory.
-It compile source (*.s) with Merlin32, copy 6502 binary to a disk image (containg ProDOS), and launch Applewin with this disk in S7,D1.
+It compiles source (*.s) with Merlin32, copy 6502 binary to a disk image (containg ProDOS), and launch Applewin with this disk in S7,D1.
 
