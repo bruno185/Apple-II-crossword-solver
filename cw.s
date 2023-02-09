@@ -174,7 +174,7 @@ main
         closef #$00     ; close all files
         jsr FREEBUFR    ; free all buffers 
         jsr bigloop     ; main program loop : porcess all letters for one part
-        jsr bigdisplay    ; prints found words
+        jsr bigdisplay  ; prints found words
 
         jsr updatetotcnt ; update total found
 
