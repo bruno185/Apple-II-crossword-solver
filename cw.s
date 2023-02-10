@@ -136,16 +136,16 @@ init    equ *
         prnstr patternlib
         jsr mygetln     ; let user type pattern
         jsr testpat     ; if no letter in partter, googpat var 
-        lda quitflag    ; ctrl-c or escape ?
-        bne exit2
-        lda pattern
+        lda quitflag    ; if ctrl-c or escape then quitflag > 0
+        bne exit2       
+        lda pattern     ; get pattern length
         cmp #$02        ; pattern length msut be >= 2
         bpl okpat
         cr
-        prnstr kopatlib ; wrong pattern, message and exit
-        jsr dowait
-        jmp init
-exit2   rts 
+        prnstr kopatlib ; wrong pattern, message and loop
+        jsr dowait      ; wait for a key pressed
+        jmp init        ; goto beginning
+exit2   rts             ; end of program
 
 okpat   cr
         cr
@@ -183,13 +183,12 @@ main
         cmp #$05        ; done ?
         bne main        ; no : loop
 
-        jsr showres     ; now show result (count)
+        jsr showres     ; show final result (count)
 
-eop     jsr dowait
-        closef #$00      
+eop     jsr dowait      ; wait for a pressed key 
+        closef #$00     ; close all files 
         jsr FREEBUFR    ; free all buffers
-        jmp init
-                        ; end of program
+        jmp init        
 *
 ******************** main program end ********************
 
@@ -266,7 +265,7 @@ showres
         cr
         prnstr totallib ; print lib
         jsr print24bits ; print number of found words   
-        rts             ; exit
+        rts             ; 
 *
 updatetotcnt            ; add counter to totalcnt (3 bytes integers)
         clc
@@ -341,9 +340,7 @@ ok1
         da d1_param
         bcc eofok
         jmp ko
-eofok   
-        ;prnstr okeoflib         ; display file length (using FP routines)
-        ;cr        
+eofok        
 * read RLE index 
         jsr readindex   ; prepare loading of index file
         jsr MLI         ; load file in main memory
@@ -784,7 +781,7 @@ dodadd
 result  ldx #$00                ; print data read in file (rdbuff = prameter of read mli call)
 rslt    lda rdbuff,x
         beq finres              ; exit if char = 0
-        ;ora #$80
+        ;ora #$80               ; inverse video 
         jsr cout
         inx 
         cpx #reclength          ; no more then record length
@@ -1091,16 +1088,4 @@ words           str 'WORDS'
 pattern ds 16
 refword ds 1
 **************************************************
-;lettrelib str 'letter : '
-;okopenlib str 'open OK'
-;okreadlib str 'read OK'
-;okeoflib str 'get_eof OK'
-;koreadlib str 'read ko !!'
-;rlesizelib str 'rle file size : '
-;indexsizelib str 'index size :'
-;decstartlib     str 'start decode'
-;decstoplib      str 'stop decode'
-;startandlib     str 'start AND'
-;stopandlib      str 'stop AND'
-
 prgend  equ *
