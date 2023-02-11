@@ -19,6 +19,7 @@ It is certainly possible to improve the performance, for example by using uncomp
 The algorithm is the one used in the French software "Easy Puss", for those who remember this database software for Apple II published in the 80's. It is applied to letters and their positions in this case.
 I found the list of words here: http://www.3zsoftware.com/fr/listes.php
 (ods6.txt)
+ProDOS : "ProDOS 8 Technical Reference Manual", "Beneath Apple ProDOS"
 
 ## Requirements to compile and run
 
