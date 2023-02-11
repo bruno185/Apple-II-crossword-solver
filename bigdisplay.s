@@ -35,6 +35,8 @@ dodey   dey
         jmp dodey
 
 go
+        lda #3
+        jsr vtab
 *** WORDS file
         jsr copyindextomain     ; copy index to main 
 

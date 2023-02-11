@@ -1,7 +1,9 @@
 ************************
 *   crossword solver   * 
 ************************
-* version  1.1
+* History ;
+* version  1.1 : get rid of tempo files
+* version 1.2 : add a progress bar
 * no tempo file, works in memory only.
 *
 * MLI (ProDOS)
@@ -60,9 +62,10 @@ col80on         equ $C00D
 * page 0
 cv              equ $25
 ch              equ $24 
+basl            equ $28
 wndlft          equ $20
 wndwdth         equ $21
-wndtop          equ $22
+wndtop          equ $22         ; Top Margin (0 - 23, 0 is default, 20 in graphics mode)
 wndbtm          equ $23 
 prompt          equ $33
 *
@@ -99,6 +102,10 @@ indexrl  equ $2000      ; loads RLE index here  => main mem.
 ptr1     equ $06        ;
 ptr2     equ $08
 reclength       equ $10 ; length of record in words file
+pbline  equ $03         ; # of text line for progressbar
+pbchar  equ #'>'
+pbora   equ #$80
+
 *
 ********************  memory org.  ***********************
 * program : $1000 (main AND aux memory, using AUXMOV)
@@ -164,8 +171,16 @@ okpat   cr
 
         sta col
 
+        sta pbpos       ; init progress bar in position 0
+
         lda #$01        ; start with part 1
         sta part
+        
+        
+
+        lda #4          ; set top margin to 4 
+        sta wndtop
+
 
 ********************  MAIN LOOP  **********************
 main    
@@ -174,9 +189,12 @@ main
         closef #$00     ; close all files
         jsr FREEBUFR    ; free all buffers 
         jsr bigloop     ; main program loop : porcess all letters for one part
-        jsr bigdisplay  ; prints found words
+        jsr progressbar
+        jsr bigdisplay  ; prints found words 
 
         jsr updatetotcnt ; update total found
+
+        jsr progressbar
 
         inc part        ; next part (on 4)
         lda part 
@@ -191,8 +209,36 @@ eop     jsr dowait      ; wait for a pressed key
         jmp init        
 *
 ******************** main program end ********************
+progressbar
+        lda #pbline     ; get line # for progreebar
+        jsr bascalc     ; get base address 
+        lda pbpos 
+        clc
+        adc basl
+        sta basl
+        lda #$00
+        adc basl+1
+        sta basl+1
+        lda pbchar
+        ora pbora
+        ldy #$00
+        sta $C000
+ploop
+        sta RAMWRTON
+        sta (basl),y 
+        sta RAMWRTOFF
+        sta (basl),y 
+        
+        inc pbpos
+        iny
+        cpy #5
+        beq pbexit
+nibas   jmp ploop
 
+pbexit  sta $C001
+        rts
 
+*************************************
 bigloop lda #$01
         sta pos         ; position in pattern = 1
         clc
@@ -259,7 +305,6 @@ showres
         lda totalcnt+2
         sta counter+2
         cr
-        cr
         prnstr patlib   ; recall pattern
         prnstr pattern
         cr
@@ -313,7 +358,7 @@ copyindextomain         ; copyfrom AUX to MAIN , same address, length=index bitm
         jsr AUXMOV      ; move
         rts
 
-
+*
 dofile
 * process a RLE file : 
 * - load it
@@ -472,12 +517,10 @@ readindex               ; read RLE index file into RAM
         sta rreq+1
         rts
 
-******************************************
 ****************** decode ****************
 *                  input :               *
 * if carry clear : destination = bitmap1 *
 * if carry set   : destination = bitmap2 *
-******************************************
 ******************************************
 decode
         bcs bmp2 
@@ -637,7 +680,7 @@ looptp  lda pattern,x ; get a char from pattern
         dex
         bne looptp
         lda #$01
-        sta noletter
+        sta noletter    ; set flag 
         rts             ; all letters are '?'
 
 letterfound             ; set flag and exit
@@ -1070,6 +1113,7 @@ savech  ds 1
 quitflag da 1
 savebit ds 1
 col     ds 1
+pbpos   ds 1
 
 **** strings ****
 kolib   str "Error : "
@@ -1080,7 +1124,7 @@ patternlib      str 'Enter pattern (A-Z and ?) : '
 kopatlib        str 'Error in pattern !'
 patlib          str 'Pattern : '
 seplib          str ' : '
-titlelib        asc ' C R O S S W ? R D   S O L V E R (v. 1.1)'
+titlelib        asc ' C R O S S W ? R D   S O L V E R (v. 1.2)'
                 hex 00
 
 words           str 'WORDS'
