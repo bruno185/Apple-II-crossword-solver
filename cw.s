@@ -208,30 +208,30 @@ eop     jsr dowait      ; wait for a pressed key
 progressbar
         lda #pbline     ; get line # for progressbar
         jsr bascalc     ; get base address 
-        lda pbpos 
-        clc
+        lda pbpos       ; get last h positino
+        clc             ; add it to pointer
         adc basl
         sta basl
         lda #$00
         adc basl+1
         sta basl+1
-        lda pbchar
-        ora pbora
-        ldy #$00
-        sta $C000
+        lda pbchar      ; get char to display in progressbar
+        ora pbora       ; ora parameter char 
+        ldy #$00        ; init loop counter
+        sta $C000       ; 80store on
 ploop
-        sta RAMWRTON
+        sta RAMWRTON    ; write char in aux
         sta (basl),y 
         sta RAMWRTOFF
-        sta (basl),y 
+        sta (basl),y    ; write char in aux
         
-        inc pbpos
-        iny
-        cpy #5
-        beq pbexit
-nibas   jmp ploop
+        inc pbpos       ; update h position
+        iny             ; inc counter
+        cpy #10         ; test end of loop
+        beq pbexit      ; end : exit
+nibas   jmp ploop       ; go on
 
-pbexit  sta $C001
+pbexit  sta $C001       ; 80store off
         rts
 
 *************************************
