@@ -171,7 +171,7 @@ okpat   cr
 
         sta col
 
-        sta pbpos       ; init progress bar in position 0
+        sta pbpos       ; init progressbar in position 0
 
         lda #$01        ; start with part 1
         sta part
@@ -184,16 +184,12 @@ okpat   cr
 
 ********************  MAIN LOOP  **********************
 main    
-        ;lda #$00
-        ;sta $BF94
         closef #$00     ; close all files
         jsr FREEBUFR    ; free all buffers 
         jsr bigloop     ; main program loop : porcess all letters for one part
-        jsr progressbar
+        ;jsr progressbar
         jsr bigdisplay  ; prints found words 
-
         jsr updatetotcnt ; update total found
-
         jsr progressbar
 
         inc part        ; next part (on 4)
@@ -210,7 +206,7 @@ eop     jsr dowait      ; wait for a pressed key
 *
 ******************** main program end ********************
 progressbar
-        lda #pbline     ; get line # for progreebar
+        lda #pbline     ; get line # for progressbar
         jsr bascalc     ; get base address 
         lda pbpos 
         clc
