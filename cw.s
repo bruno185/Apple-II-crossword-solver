@@ -109,11 +109,11 @@ pbora   equ #$80
 *
 ********************  memory org.  ***********************
 * program : $1000 (main AND aux memory, using AUXMOV)
-* RLE file loading address : $2000 (main memory) => < $8200 (for biggest RLE file )
-* bitmap1 (for uncompressed RLE file): $2000 -> $4FFF (aux memory)  
-* bitmap2 (for uncompressed RLE file): $5000 -> $7FFF (aux memory)
+* RLE index file loading address : $2000 (main memory) => < $8200 (for biggest RLE file )
+* bitmap1 (for uncompressed RLE index file): $2000 -> $4FFF (aux memory)  
+* bitmap2 (for uncompressed RLE index file): $5000 -> $7FFF (aux memory)
 * buffer for OPEN MLI call (1024 bytes), RLE files : $8400
-* buffer for OPEN MLI call (1024 bytes), RLE files : $8800
+* buffer for OPEN MLI call (1024 bytes), WORDS files : $8800
 *
 ********************  main program  **********************
         MX %11
@@ -267,7 +267,6 @@ bloopnext
         cpx pattern     ; end of pattern (1st char = length)
         bne bigll       ; no : loop
         rts
-*
 * end bigloop
 *
 dowlen                  ; Add criterion of word length by load Lx RLE index file 
@@ -486,7 +485,7 @@ ni      inc ptr2
         inc ptr2+1
 ni2     lda ptr1+1
         ;cmp #>bitmap2   ; end of area ?
-        cmp #$4f
+        cmp #$4f        ; area is $2F27 long (and strats at $2000)
         bne andloop
         lda ptr1
         cmp #$28
