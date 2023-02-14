@@ -133,11 +133,11 @@ init    equ *
         ;jsr OUTPORT    ; 80 col.
         ; lda #$15      ; 40 cols, Character that turns off video firmware (ProDOS technical reference)
         jsr $C300       ; 80 col. (http://www.deater.net/weave/vmwprod/demos/sizecoding.html)
-        jsr text        ; clear screen
-        jsr home        ; cursor to upper left corner
-        jsr ramout      ; disconnect /RAM disk
-        printc titlelib
-        cr
+        jsr text        ; text mode
+        jsr home        ; clear screen + cursor to upper left corner
+        jsr ramout      ; disconnect /RAM disk if any
+        printc titlelib ; display title of program
+        cr              ; print return (macro)
         lda #$00
         sta $BF94
         closef #$00     ; close all files
@@ -147,11 +147,11 @@ init    equ *
         prnstr path     ; print it
         cr
 
-        prnstr patternlib
+        prnstr patternlib       ; print label 
         jsr mygetln     ; let user type pattern
-        jsr testpat     ; if no letter in partter, googpat var 
+        jsr testpat     ; test if letter(s) in partter, set noletter var 
         lda quitflag    ; if ctrl-c or escape then quitflag > 0
-        bne exit2       
+        bne exit2       ; yes : exit program
         lda pattern     ; get pattern length
         cmp #$02        ; pattern length msut be >= 2
         bpl okpat
@@ -159,6 +159,7 @@ init    equ *
         prnstr kopatlib ; wrong pattern, message and loop
         jsr dowait      ; wait for a key pressed
         jmp init        ; goto beginning
+
 exit2   rts             ; end of program
 
 okpat   cr
@@ -176,7 +177,7 @@ okpat   cr
         sta wordscnt+1
         sta wordscnt+2
 
-        sta col         ; horiz. position 
+        sta col         ; horiz. position of resulting words 
 
         sta pbpos       ; init progressbar in position 0
 
@@ -206,7 +207,7 @@ main
 eop     jsr dowait      ; wait for a pressed key 
         closef #$00     ; close all files 
         jsr FREEBUFR    ; free all buffers
-        jmp init        
+        jmp init        ; loop to the beginning
 *
 ******************** main program end ********************
 progressbar
@@ -291,7 +292,7 @@ dowlen                  ; Add criterion of word length by load Lx RLE index file
         lda #'0'
         clc
         adc part
-        sta fname+6
+        sta fname+6     ; part #
         rts
 *
 * show result of count
@@ -358,9 +359,9 @@ copyindextomain         ; copyfrom AUX to MAIN , same address, length=index bitm
 
 *
 dofile
-* process a RLE file : 
+* process a RLE index file : 
 * - load it
-* - decode to aux mem
+* - decode data to aux mem
 * - AND bitmap1 and bitmap2 memory areas
 *
 * open RLE file
@@ -409,7 +410,7 @@ setopenbuffer           ; set buffer to $8400 for OPEN mli call
         sta fbuff+1
         rts
 
-* count bit set to 1 in index
+* count bit set to 1 in index (unused in this version)
 countbit
         lda #>bitmap1   ; set pointer to $2000 area
         sta ptr1+1
