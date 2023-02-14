@@ -13,7 +13,7 @@
 * The creation of index files is done with the Delphi program here :
 * https://github.com/bruno185/Make-index-for-Apple-II-crossword-solver
 *
-* MLI (ProDOS)
+* MLI calls (ProDOS)
 MLI             equ $BF00
 create          equ $C0
 destroy         equ $C1
