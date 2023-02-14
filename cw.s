@@ -1,10 +1,17 @@
 ************************
 *   crossword solver   * 
 ************************
-* History ;
-* version  1.1 : get rid of tempo files
+* Purpose : make search in a 386 264 french words list.
+* Uses run length encoded bitmap index files.
+*
+* History :
+* version 1.0 : uses tempo files 
+* version 1.1 : get rid of tempo files, works in memory mostly.
 * version 1.2 : add a progress bar
-* no tempo file, works in memory only.
+*
+* IMPORTANT : 
+* The creation of index files is done with the Delphi program here :
+* https://github.com/bruno185/Make-index-for-Apple-II-crossword-solver
 *
 * MLI (ProDOS)
 MLI             equ $BF00
@@ -103,8 +110,8 @@ ptr1     equ $06        ;
 ptr2     equ $08
 reclength       equ $10 ; length of record in words file
 pbline  equ $03         ; # of text line for progressbar
-pbchar  equ #'>'
-pbora   equ #$80
+pbchar  equ #'>'        ; char for progressbar
+pbora   equ #$80        ; char bit 7 for progressbar
 
 *
 ********************  memory org.  ***********************
@@ -169,18 +176,15 @@ okpat   cr
         sta wordscnt+1
         sta wordscnt+2
 
-        sta col
+        sta col         ; horiz. position 
 
         sta pbpos       ; init progressbar in position 0
 
         lda #$01        ; start with part 1
         sta part
-        
-        
 
         lda #4          ; set top margin to 4 
         sta wndtop
-
 
 ********************  MAIN LOOP  **********************
 main    
@@ -257,7 +261,6 @@ bigll
 
         jsr dofile      ; load RLE file in main, decode in aux ($5000 area)
                         ; AND $2000 area and $5000 area, result in $2000 area (in aux)
-* optimisation : comment next 3 jsr.
 dolong  jsr dowlen      ; set RLE index file name for length
         jsr dofile      ; process RLE inde
 bloopnext
@@ -320,7 +323,7 @@ updatetotcnt            ; add counter to totalcnt (3 bytes integers)
         sta totalcnt+2
         rts
 *
-copymaintoaux           ; copy program ton AUX memory
+copymaintoaux           ; copy program to AUX memory
         lda #>init
         sta $3d         ; source high
         sta $43         ; dest high
@@ -361,11 +364,7 @@ dofile
 * - AND bitmap1 and bitmap2 memory areas
 *
 * open RLE file
-        ;jsr setopenbuffer       ; get free mem from ProDOS for OPEN call (mli)
-        lda #$00
-        sta fbuff
-        lda #$84
-        sta fbuff+1
+        jsr setopenbuffer       ; get free mem from ProDOS for OPEN call (mli)
         jsr MLI                 ; OPEN file 
         dfb open
         da  c8_parms
@@ -375,14 +374,14 @@ ok1
 * get eof (to get file size)
         lda ref
         sta refd1
-        jsr MLI                 ; get file length
+        jsr MLI                 ; get file length (set file length for next read MLI call)
         dfb geteof
         da d1_param
         bcc eofok
         jmp ko
 eofok        
 * read RLE index 
-        jsr readindex   ; prepare loading of index file
+        jsr readindex   ; prepare loading of index file (set ID, req. length, etc.)
         jsr MLI         ; load file in main memory
         dfb read
         da  ca_parms
@@ -776,7 +775,6 @@ no_add
 factor1 hex 00
 factor2 hex 00
 
-
 print24bits
 * prints 3 bytes integer in counter/counter+1/counter+2
 * counter+2 must be positive
@@ -838,10 +836,8 @@ ko      pha             ; save error code
 
 *********** Wait for a key ***********
 dowait
-        ;bit kbdstrb
-dowait2
         lda kbd
-        bpl dowait2
+        bpl dowait
         bit kbdstrb
         rts
 *
@@ -893,9 +889,7 @@ l1      lda path,x
 good1   
         rts
 *
-        ; put disp.s
         put bigdisplay.S
-
 
 ********************  disconnect /RAM  **********************
 * from : https://prodos8.com/docs/techref/writing-a-prodos-system-program/
@@ -1002,6 +996,8 @@ ramunitid dfb $00     ; store the device's unit number here
 
 
 *********** DATA ***********
+
+*********** MLI call parameters ***********
 quit_parms              ; QUIT call
         hex 04
         hex 0000
