@@ -195,7 +195,7 @@
   195 |  1         cw.s    144 | Empty       | 11 |         |    0 | 00/1060               |                                         
   196 |  1         cw.s    145 | Comment     | 11 |         |    0 | 00/1060               | * set prefix
   197 |  1         cw.s    146 | Code        | 11 |         |    3 | 00/1060 : 20 95 15    |                  jsr     doprefix       ; set prefix
-  198 |  1         cw.s    147 | Macro       | 11 |         |    0 | 00/1063               |                  prnstr  path           ; print it
+  198 |  1         cw.s    147 | Macro       | 11 |         |    0 | 00/1063               |                  prnstr  path           ; display prefix
   199 |  1         cw.s    147 | Code        | 11 |         |    3 | 00/1063 : AC 15 19    |                  ldy     path           
   200 |  1         cw.s    147 | Code        | 11 |         |    2 | 00/1066 : F0 0E       |                  beq     ozunid_14      ; no char.
   201 |  1         cw.s    147 | Code        | 11 |         |    2 | 00/1068 : A2 00       |                  ldx     #$00           
@@ -253,18 +253,18 @@
   253 |  1         cw.s    168 | Comment     | 11 |         |    0 | 00/10C1               | ********************  init  **********************
   254 |  1         cw.s    169 | Code        | 11 |         |    3 | 00/10C1 : 20 31 12    |                  jsr     copymaintoaux  ; copy program in aux mem at same address, using AUXMOV
   255 |  1         cw.s    170 | Empty       | 11 |         |    0 | 00/10C4               |                                         
-  256 |  1         cw.s    171 | Code        | 11 |         |    2 | 00/10C4 : A9 00       |                  lda     #$00           ; init total counter (sum of counters for 4 parts)
+  256 |  1         cw.s    171 | Code        | 11 |         |    2 | 00/10C4 : A9 00       |                  lda     #$00           ; init. total counter (sum of counters for 4 parts, 3 bytes integer)
   257 |  1         cw.s    172 | Code        | 11 |         |    3 | 00/10C6 : 8D 35 1A    |                  sta     totalcnt       
   258 |  1         cw.s    173 | Code        | 11 |         |    3 | 00/10C9 : 8D 36 1A    |                  sta     totalcnt+1     
   259 |  1         cw.s    174 | Code        | 11 |         |    3 | 00/10CC : 8D 37 1A    |                  sta     totalcnt+2     
   260 |  1         cw.s    175 | Empty       | 11 |         |    0 | 00/10CF               |                                         
-  261 |  1         cw.s    176 | Code        | 11 |         |    3 | 00/10CF : 8D 3E 1A    |                  sta     wordscnt       ; init word counter to 0
+  261 |  1         cw.s    176 | Code        | 11 |         |    3 | 00/10CF : 8D 3E 1A    |                  sta     wordscnt       ; init. word counter to 0 (3 bytes integer)
   262 |  1         cw.s    177 | Code        | 11 |         |    3 | 00/10D2 : 8D 3F 1A    |                  sta     wordscnt+1     
   263 |  1         cw.s    178 | Code        | 11 |         |    3 | 00/10D5 : 8D 40 1A    |                  sta     wordscnt+2     
   264 |  1         cw.s    179 | Empty       | 11 |         |    0 | 00/10D8               |                                         
-  265 |  1         cw.s    180 | Code        | 11 |         |    3 | 00/10D8 : 8D 58 1A    |                  sta     col            ; horiz. position of resulting words
+  265 |  1         cw.s    180 | Code        | 11 |         |    3 | 00/10D8 : 8D 58 1A    |                  sta     col            ; init. horiz. position of resulting words
   266 |  1         cw.s    181 | Empty       | 11 |         |    0 | 00/10DB               |                                         
-  267 |  1         cw.s    182 | Code        | 11 |         |    3 | 00/10DB : 8D 59 1A    |                  sta     pbpos          ; init progressbar in position 0
+  267 |  1         cw.s    182 | Code        | 11 |         |    3 | 00/10DB : 8D 59 1A    |                  sta     pbpos          ; init. progressbar in position 0
   268 |  1         cw.s    183 | Empty       | 11 |         |    0 | 00/10DE               |                                         
   269 |  1         cw.s    184 | Code        | 11 |         |    2 | 00/10DE : A9 01       |                  lda     #$01           ; start with part 1
   270 |  1         cw.s    185 | Code        | 11 |         |    3 | 00/10E0 : 8D 53 1A    |                  sta     part           
@@ -272,7 +272,7 @@
   272 |  1         cw.s    187 | Code        | 11 |         |    2 | 00/10E3 : A9 04       |                  lda     #4             ; set top margin to 4
   273 |  1         cw.s    188 | Code        | 11 |         |    2 | 00/10E5 : 85 22       |                  sta     {$22}          
   274 |  1         cw.s    189 | Empty       | 11 |         |    0 | 00/10E7               |                                         
-  275 |  1         cw.s    190 | Comment     | 11 |         |    0 | 00/10E7               | ********************  MAIN LOOP  **********************
+  275 |  1         cw.s    190 | Comment     | 11 |         |    0 | 00/10E7               | ******************** main loop for searching words **********************
   276 |  1         cw.s    191 | Empty       | 11 |         |    0 | 00/10E7               | main                                    
   277 |  1         cw.s    192 | Macro       | 11 |         |    0 | 00/10E7               |                  closef  #$00           ; close all files
   278 |  1         cw.s    192 | Code        | 11 |         |    2 | 00/10E7 : A9 00       |                  lda     #$00           

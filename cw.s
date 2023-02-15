@@ -144,7 +144,7 @@ init    equ *
 
 * set prefix
         jsr doprefix    ; set prefix
-        prnstr path     ; print it
+        prnstr path     ; display prefix
         cr
 
         prnstr patternlib       ; print label 
@@ -168,18 +168,18 @@ okpat   cr
 ********************  init  **********************
         jsr copymaintoaux  ; copy program in aux mem at same address, using AUXMOV
 
-        lda #$00        ; init total counter (sum of counters for 4 parts)
+        lda #$00        ; init. total counter (sum of counters for 4 parts, 3 bytes integer)
         sta totalcnt    
         sta totalcnt+1
         sta totalcnt+2
         
-        sta wordscnt     ; init word counter to 0
+        sta wordscnt     ; init. word counter to 0 (3 bytes integer)
         sta wordscnt+1
         sta wordscnt+2
 
-        sta col         ; horiz. position of resulting words 
+        sta col         ; init. horiz. position of resulting words 
 
-        sta pbpos       ; init progressbar in position 0
+        sta pbpos       ; init. progressbar in position 0
 
         lda #$01        ; start with part 1
         sta part
@@ -187,7 +187,7 @@ okpat   cr
         lda #4          ; set top margin to 4 
         sta wndtop
 
-********************  MAIN LOOP  **********************
+******************** main loop for searching words **********************
 main    
         closef #$00     ; close all files
         jsr FREEBUFR    ; free all buffers 
