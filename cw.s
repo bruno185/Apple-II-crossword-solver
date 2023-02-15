@@ -110,7 +110,7 @@ ptr1     equ $06        ;
 ptr2     equ $08
 reclength       equ $10 ; length of record in words file
 pbline  equ $03         ; # of text line for progressbar
-pbchar  equ #'>'        ; char for progressbar
+pbchar  equ #'-'        ; char for progressbar
 pbora   equ #$80        ; char bit 7 for progressbar
 
 *
@@ -192,7 +192,7 @@ main
         closef #$00     ; close all files
         jsr FREEBUFR    ; free all buffers 
         jsr bigloop     ; main program loop : porcess all letters for one part
-        ;jsr progressbar
+        jsr progressbar
         jsr bigdisplay  ; prints found words 
         jsr updatetotcnt ; update total found
         jsr progressbar
@@ -232,7 +232,7 @@ ploop
         
         inc pbpos       ; update h position
         iny             ; inc counter
-        cpy #10         ; test end of loop
+        cpy #05         ; test end of loop
         beq pbexit      ; end : exit
 nibas   jmp ploop       ; go on
 
@@ -259,9 +259,9 @@ bigll
         sta letter      ; yes : save char in letter var
 
         jsr interpret   ; set filename based on letter, position and part
-
         jsr dofile      ; load RLE file in main, decode in aux ($5000 area)
                         ; AND $2000 area and $5000 area, result in $2000 area (in aux)
+
 dolong  jsr dowlen      ; set RLE index file name for length
         jsr dofile      ; process RLE inde
 bloopnext
