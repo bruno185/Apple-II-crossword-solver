@@ -1,6 +1,6 @@
 # Apple II Croosword Solver
 
-NEw : SEE new version here :
+NEW : new version here :
 https://github.com/bruno185/Apple-II-crossword-solver-v.1.4-
 
 Here is a program for solving crossword puzzles, working in the 128 kB (only) of an Apple IIe, IIc, or IIGS of course.
