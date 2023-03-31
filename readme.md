@@ -1,6 +1,6 @@
 # Apple II Croosword Solver
 
-NEW : new versions here :
+NEW : new versions here (much faster) :
 
 French version : https://github.com/bruno185/Apple-II-crossword-solver-v.2.0-French
 
