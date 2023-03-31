@@ -1,7 +1,10 @@
 # Apple II Croosword Solver
 
-NEW : new version here :
-https://github.com/bruno185/Apple-II-crossword-solver-v.1.4-
+NEW : new versions here :
+
+French version : https://github.com/bruno185/Apple-II-crossword-solver-v.2.0-French
+
+English version : https://github.com/bruno185/Apple-II-crossword-solver-v.2.0-English
 
 Here is a program for solving crossword puzzles, working in the 128 kB (only) of an Apple IIe, IIc, or IIGS of course.
 The challenge was to find the "hole words" among the 386 264 French words allowed in Scrabble, from 2 to 15 letters.
